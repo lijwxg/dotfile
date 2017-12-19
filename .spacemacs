@@ -29,8 +29,8 @@ This function should only modify configuration layer settings."
    dotspacemacs-configuration-layer-path '()
    ;; List of configuration layers to load.
    dotspacemacs-configuration-layers
-   '(html
-     python
+   '(
+     ;; python
      ;; ----------------------------------------------------------------
      ;; Example of useful layers you may want to use right away.
      ;; Uncomment some layer names and press `SPC f e R' (Vim style) or
@@ -40,14 +40,16 @@ This function should only modify configuration layer settings."
      auto-completion
      better-defaults
      emacs-lisp
-     ;; git
+     git
      markdown
-     ;; org
+     org
+	 ranger
+	 (colors :variables colors-enable-nyan-cat-progress-bar t)
      (shell :variables
             shell-default-height 30
             shell-default-position 'bottom)
      ;; spell-checking
-     ;; syntax-checking
+     syntax-checking
      ;; version-control
      )
    ;; List of additional packages that will be installed without being
@@ -126,14 +128,15 @@ It should only modify the values of Spacemacs settings."
    ;; List of themes, the first of the list is loaded when spacemacs starts.
    ;; Press `SPC T n' to cycle to the next theme in the list (works great
    ;; with 2 themes variants, one dark and one light)
-   dotspacemacs-themes '(spacemacs-dark
+   dotspacemacs-themes '(monokai
+						 spacemacs-dark
                          spacemacs-light)
    ;; If non-nil the cursor color matches the state color in GUI Emacs.
    ;; (default t)
    dotspacemacs-colorize-cursor-according-to-state t
    ;; Default font, or prioritized list of fonts. `powerline-scale' allows to
    ;; quickly tweak the mode-line size to make separators look not too crappy.
-   dotspacemacs-default-font '("Source Code Pro"
+   dotspacemacs-default-font '("Courier New"
                                :size 13
                                :weight normal
                                :width normal
@@ -338,6 +341,11 @@ This function is called immediately after `dotspacemacs/init', before layer
 configuration.
 It is mostly for variables that should be set before packages are loaded.
 If you are unsure, try setting them in `dotspacemacs/user-config' first."
+  (setq-default
+   configuration-layer--elpa-archives
+   '(("melpa-cn" . "https://mirrors.tuna.tsinghua.edu.cn/elpa/melpa/")
+     ("gnu-cn" . "https://mirrors.tuna.tsinghua.edu.cn/elpa/gnu/")
+     ("org-cn" . "https://mirrors.tuna.tsinghua.edu.cn/elpa/org/")))
   )
 
 (defun dotspacemacs/user-config ()
@@ -350,6 +358,58 @@ before packages are loaded."
   ;; Set escape keybinding to "jk"
   (setq-default evil-escape-key-sequence "jk")
 
+  ;; Set clipboard global Copy and paste between Emacs instances
+  (setq x-select-enable-clipboard t)
+  ;; (setq interprogram-paste-function 'x-cut-buffer-or-selection-value)
+
+  ;; set GTD keywords
+  (setq org-todo-keywords
+    '((sequence "TODO(t!)" "NEXT(n)" "WAITTING(w)" "SOMEDAY(s)" "|" "DONE(d@/!)" "ABORT(a@/!)")
+     )) 
+  
+  ;; set make-backup-files nil
+  (setq make-backup-files nil)
+
+  ;; show line-numbers on the global
+  ;;(spacemacs/toggle-line-numbers-on)
+
+  ;;glocal company mode
+  ;; (global-company-mode)
+
+  ;; org mode files
+  (setq org-agenda-files '("D:/li/GTD/inbox.org"
+						   "D:/li/GTD/note.org"
+						   "D:/li/GTD/task.org"
+						   "D:/li/GTD/trash.org"
+						   "D:/li/GTD/finished.org"
+						   "D:/li/GTD/project.org"))
+						  
+  ;; set org-capture-templates
+  (setq org-capture-templates '(("i" "Inbox" entry
+                               (file+headline "D:/li/GTD/inbox.org" "Inbox")
+                               "* %i%?")
+                               ("n" "Note" entry
+                               (file+headline "D:/li/GTD/note.org" "Note")
+                               "* %i%? \n %U")
+							   ("t" "Task" entry
+                               (file+headline "D:/li/GTD/task.org" "Task")
+                               "* TODO %i%? \n %U")						   
+							   ("p" "project" entry
+                               (file+headline "D:/li/GTD/project.org" "project")
+                               "* %i%? \n %U")))
+							   
+							   ;; ("N" "Note" entry
+                               ;; (file+headline "D:/li/GTD/trash.org" "Tickler")
+                               ;; "* %i%? \n %U")
+							   ;; ("N" "Note" entry
+                               ;; (file+headline "D:/li/GTD/finished.org" "Tickler")
+                               ;; "* %i%? \n %U")
+    
+  ;; set org-refile-targets
+  (setq org-refile-targets '(("D:/li/GTD/task.org" :maxlevel . 3)
+                            ("D:/li/GTD/trash.org" :level . 1)
+                            ("D:/li/GTD/finished.org" :maxlevel . 2)))
+							
   ;; Set to your WebDAV root directory /org  org-mobile-directory
   (setq org-mobile-directory "~/Nutstore/org")
 
@@ -361,17 +421,7 @@ before packages are loaded."
 
   ;; Set to the name of the file where new notes will be stored org-mobile-inbox-for-pull
   (setq org-mobile-inbox-for-pull "~/Nutstore/org/Mobile/flagged.org")
-
-  ;; Set clipboard global Copy and paste between Emacs instances
-  (setq x-select-enable-clipboard t)
-  ;; (setq interprogram-paste-function 'x-cut-buffer-or-selection-value)
-
-  ;; show line-numbers on the global
-  ;;(spacemacs/toggle-line-numbers-on)
-
-  ;;glocal company mode
-  (global-company-mode)
-
+  
   ;;global flycheck mode
   ;; (global-flycheck-mode)
   )
@@ -399,3 +449,17 @@ This function is called at the very end of Spacemacs initialization."
  ;; If there is more than one, they won't work right.
  )
 )
+(custom-set-variables
+ ;; custom-set-variables was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ '(package-selected-packages
+   (quote
+    (rainbow-mode rainbow-identifiers markdown-mode dash-functional pos-tip flycheck company color-identifiers-mode yasnippet anaconda-mode pythonic auto-complete gitignore-mode magit magit-popup git-commit ghub let-alist with-editor ranger org-category-capture alert log4e gntp xterm-color web-mode unfill tagedit slim-mode shell-pop scss-mode sass-mode pug-mode mwim multi-term less-css-mode helm-css-scss haml-mode flyspell-correct-helm flyspell-correct eshell-z eshell-prompt-extras esh-help emmet-mode company-web web-completion-data auto-dictionary yapfify ws-butler winum which-key volatile-highlights vi-tilde-fringe uuidgen use-package toc-org spaceline smeargle restart-emacs rainbow-delimiters pyvenv pytest pyenv-mode py-isort popwin pip-requirements persp-mode pcre2el paradox orgit org-projectile org-present org-pomodoro org-download org-bullets open-junk-file neotree move-text mmm-mode markdown-toc magit-gitflow macrostep lorem-ipsum live-py-mode linum-relative link-hint info+ indent-guide hy-mode hungry-delete htmlize hl-todo highlight-parentheses highlight-numbers highlight-indentation hide-comnt help-fns+ helm-themes helm-swoop helm-pydoc helm-projectile helm-mode-manager helm-make helm-gitignore helm-flx helm-descbinds helm-company helm-c-yasnippet helm-ag google-translate golden-ratio gnuplot gitconfig-mode gitattributes-mode git-timemachine git-messenger git-link gh-md fuzzy flycheck-pos-tip flx-ido fill-column-indicator fancy-battery eyebrowse expand-region exec-path-from-shell evil-visualstar evil-visual-mark-mode evil-unimpaired evil-tutor evil-surround evil-search-highlight-persist evil-numbers evil-nerd-commenter evil-mc evil-matchit evil-magit evil-lisp-state evil-indent-plus evil-iedit-state evil-exchange evil-escape evil-ediff evil-args evil-anzu eval-sexp-fu elisp-slime-nav dumb-jump define-word cython-mode company-statistics company-anaconda column-enforce-mode clean-aindent-mode auto-yasnippet auto-highlight-symbol auto-compile aggressive-indent adaptive-wrap ace-window ace-link ace-jump-helm-line ac-ispell))))
+(custom-set-faces
+ ;; custom-set-faces was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ )
